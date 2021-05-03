@@ -17,7 +17,10 @@
 #pragma once
 
 // place overrides here
+#undef PRODUCT
+#define PRODUCT VOID ERGO HANNES KEYMAP
+
 
 #define USE_SERIAL
-// #define MASTER_LEFT
+#define MASTER_LEFT
 #define SPLIT_USB_DETECT
