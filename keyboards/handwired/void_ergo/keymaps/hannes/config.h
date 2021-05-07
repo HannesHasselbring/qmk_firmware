@@ -20,6 +20,9 @@
 #undef PRODUCT
 #define PRODUCT VOID ERGO HANNES KEYMAP
 
+// see: https://beta.docs.qmk.fm/using-qmk/software-features/tap_hold#ignore-mod-tap-interrupt
+#define IGNORE_MOD_TAP_INTERRUPT
+
 
 #define USE_SERIAL
 #define MASTER_LEFT

@@ -16,7 +16,11 @@
 #include QMK_KEYBOARD_H
 
 
-// Defines names for use in layer keycodes and the keymap
+enum custom_keycodes {
+    MAC_AE = SAFE_RANGE,
+    MAC_OE,
+    MAC_UE
+};
 
 // Layer
 #define L3_SPC LT(3, KC_SPACE)
@@ -26,6 +30,19 @@
 #define SFT_ENT RSFT_T(KC_ENTER)
 #define CMD_LFT LCMD(KC_LEFT)
 #define CMD_RGHT LCMD(KC_RIGHT)
+
+// Home row mod
+// see https://docs.qmk.fm/#/mod_tap
+// https://precondition.github.io/home-row-mods#cags
+// #define CTL_T(KC_A)
+// #define MODA_S MT(KC_LALT, KC_S)
+// #define MODG_D MT(KC_LGUI, KC_D)
+// #define MODS_F MT(KC_LSFT, KC_F)
+
+// #define MODS_J MT(KC_RSFT, KC_J)
+// #define MODG_K MT(KC_RGUI, KC_K)
+// #define MODA_L MT(KC_RALT, KC_L)
+// #define MODC_SM MT(KC_RSFT, KC_SCLN)
 
 // MacOS Screenshot
 #define PSHOT LSFT(LCTL(LCMD(KC_4)))
@@ -54,7 +71,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                         KC_Y,    KC_U,    KC_I,    KC_O,   KC_P,  KC_BSPC,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      CTL_ESC,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                         KC_H,    KC_J,    KC_K,    KC_L, KC_SCLN, KC_QUOT,
+      CTL_ESC,CTL_T(KC_A),LOPT_T(KC_S),LGUI_T(KC_D),LSFT_T(KC_F),KC_G,              KC_H,RSFT_T(KC_J),RGUI_T(KC_K),ROPT_T(KC_L),RCTL_T(KC_SCLN), KC_QUOT,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LSFT,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH,  SFT_ENT,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
@@ -89,11 +106,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [3] = LAYOUT_void_ergo(
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-        RESET, PSHOT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                          KC_F6, XXXXXXX,   KC_UP, XXXXXXX, XXXXXXX, XXXXXXX,
+        RESET, PSHOT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                          KC_F6,  MAC_UE,    KC_UP, MAC_OE, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX,KC_LEFT, KC_DOWN,KC_RIGHT, XXXXXXX, XXXXXXX,
+      XXXXXXX, MAC_AE, KC_LOPT, KC_LCMD, KC_LSFT, XXXXXXX,                      XXXXXXX, KC_LEFT, KC_DOWN,KC_RIGHT, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      XXXXXXX, XXXXXXX, XXXXXXX,  JCONST,    JVAR, XXXXXXX,                         JINL,   JMETH, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+      KC_LSFT, XXXXXXX, XXXXXXX,  JCONST,    JVAR, XXXXXXX,                         JINL,   JMETH, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                         _______, KC_LGUI, _______,  KC_ENT,   RESET,      JBACK,  KC_SPC, _______, KC_RALT, _______
                                       //`--------------------------'  `--------------------------'
@@ -103,6 +120,41 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 
 };
+
+//
+// source: https://github.com/qmk/qmk_firmware/blob/master/keyboards/tada68/keymaps/mlechner/keymap.c
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+	if (record->event.pressed) {
+		switch(keycode) {
+			case MAC_UE:
+        if(keyboard_report->mods & MOD_BIT(KC_LSFT)) {
+          clear_keyboard();
+          SEND_STRING(SS_LALT("u") SS_LSFT("u"));
+        } else {
+				  SEND_STRING(SS_LALT("u")"u");
+        }
+				return false;
+      case MAC_AE:
+        if(keyboard_report->mods & MOD_BIT(KC_LSFT)) {
+          clear_keyboard();
+				  SEND_STRING(SS_LALT("u") SS_LSFT("a"));
+        } else {
+          SEND_STRING(SS_LALT("u")"a");
+        }
+        return false;
+      case MAC_OE:
+        if(keyboard_report->mods & MOD_BIT(KC_LSFT)) {
+          clear_keyboard();
+          SEND_STRING(SS_LALT("u") SS_LSFT("o"));
+        } else {
+          SEND_STRING(SS_LALT("u")"o");
+        }
+        return false;
+		}
+	}
+	return true;
+};
+
 // layer_state_t layer_state_set_user(layer_state_t state) {
 //     return update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST);
 // }
